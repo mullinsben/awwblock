@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Awwblock</title>
+<style>
+  /* Colors tuned for WCAG AA contrast on the light-blue background:
+     --accent ~5:1, --ink-2 ~5.5:1 (both pass normal-text 4.5:1). */
+  :root { --accent:#2C6488; --ink:#2D3A42; --ink-2:#4F5E67; }
+  * { box-sizing: border-box; }
+  body {
+    width: 290px; margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: linear-gradient(180deg, #EBF5FB 0%, #D2E7F3 100%);
+  }
+  .wrap { padding: 18px 16px 14px; }
+
+  .brand { display: flex; align-items: center; justify-content: center; gap: 9px; }
+  .brand svg { width: 30px; height: 30px; flex: none; }
+  .brand h1 { font-size: 18px; margin: 0; letter-spacing: .2px; }
+  .sub { font-size: 12px; color: var(--ink-2); margin: 3px 0 0; text-align: center; }
+
+  .count { font-size: 46px; font-weight: 800; color: var(--accent); line-height: 1; text-align: center; margin-top: 16px; }
+  .count-label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 1.4px; color: var(--ink-2); text-align: center; margin-top: 5px; }
+  .rotation { font-size: 11px; font-weight: 600; color: var(--accent); text-align: center; margin-top: 8px; }
+
+  .card {
+    background: rgba(255,255,255,.62);
+    border: 1px solid rgba(255,255,255,.7);
+    border-radius: 12px;
+    box-shadow: 0 1px 2px rgba(40,80,110,.1);
+  }
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 16px; padding: 12px 14px; font-size: 14px; font-weight: 700;
+  }
+
+  .switch { position: relative; width: 46px; height: 26px; flex: none; }
+  .switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .slider { position: absolute; inset: 0; pointer-events: none; border-radius: 26px;
+            background: #AFC3D1; border: 1px solid #6E8493; transition: .2s; }
+  .slider:before { content: ""; position: absolute; height: 20px; width: 20px; left: 2px; top: 2px;
+            background: #fff; border: 1px solid rgba(0,0,0,.12); border-radius: 50%;
+            transition: .2s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+  input:checked + .slider { background: var(--accent); border-color: var(--accent); }
+  input:checked + .slider:before { transform: translateX(20px); }
+  .switch input:focus-visible + .slider { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .animals { margin-top: 14px; padding: 12px; }
+  .animals-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: var(--ink-2); margin: 0 2px 9px; }
+  .chips { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+  .chip {
+    display: flex; align-items: center; gap: 9px; cursor: pointer;
+    padding: 9px 11px; border-radius: 9px; font-size: 13.5px; font-weight: 600;
+    background: rgba(255,255,255,.72); user-select: none; transition: opacity .15s;
+  }
+  .chip input { accent-color: var(--accent); width: 16px; height: 16px; flex: none; }
+  .chip.off { opacity: .72; }
+
+  .foot { font-size: 10px; color: var(--ink-2); margin-top: 15px; text-align: center; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .slider, .slider:before, .chip { transition: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <rect width="128" height="128" rx="30" fill="#BBD9EA"/>
+        <ellipse cx="64" cy="100" rx="38" ry="28" fill="#F7D154"/>
+        <ellipse cx="30" cy="96" rx="11" ry="15" fill="#ECC23E"/>
+        <ellipse cx="98" cy="96" rx="11" ry="15" fill="#ECC23E"/>
+        <circle cx="64" cy="56" r="32" fill="#F9D85E"/>
+        <circle cx="55" cy="26" r="5" fill="#F9D85E"/>
+        <circle cx="64" cy="22" r="6" fill="#F9D85E"/>
+        <circle cx="73" cy="26" r="5" fill="#F9D85E"/>
+        <circle cx="51" cy="52" r="6" fill="#2A1C12"/>
+        <circle cx="77" cy="52" r="6" fill="#2A1C12"/>
+        <circle cx="53" cy="49.5" r="2" fill="#fff"/>
+        <circle cx="79" cy="49.5" r="2" fill="#fff"/>
+        <ellipse cx="64" cy="68" rx="16" ry="9" fill="#F2A03D"/>
+        <path d="M48 68 h32" stroke="#D9852A" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <h1>Awwblock</h1>
+    </div>
+    <p class="sub">ads out. aww in.</p>
+
+    <div class="count" id="count" aria-live="polite">0</div>
+    <div class="count-label" id="count-label">cuties deployed</div>
+    <div class="rotation" id="theme"></div>
+
+    <div class="toggle-row card">
+      <span id="state-label">Deploying</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle" aria-label="Turn Awwblock on or off" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="animals card">
+      <div class="animals-label" id="rotation-label">cuties in rotation</div>
+      <div class="chips" role="group" aria-labelledby="rotation-label">
+        <label class="chip"><input type="checkbox" data-animal="capybara" checked> Capybara</label>
+        <label class="chip"><input type="checkbox" data-animal="duck" checked> Ducks</label>
+        <label class="chip"><input type="checkbox" data-animal="puppy" checked> Puppies</label>
+        <label class="chip"><input type="checkbox" data-animal="kitten" checked> Kittens</label>
+      </div>
+    </div>
+
+    <div class="foot">benjaminmullins.tv · AI Lab</div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <!-- Awwblock: a cute duckling, bold and legible at 16px -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#CFE6F2"/>
+      <stop offset="1" stop-color="#A9CFE3"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="30" fill="url(#bg)"/>
+
+  <!-- body peeking up from the bottom -->
+  <ellipse cx="64" cy="100" rx="38" ry="28" fill="#F7D154"/>
+  <!-- little wings -->
+  <ellipse cx="30" cy="96" rx="11" ry="15" fill="#ECC23E"/>
+  <ellipse cx="98" cy="96" rx="11" ry="15" fill="#ECC23E"/>
+
+  <!-- head -->
+  <circle cx="64" cy="56" r="32" fill="#F9D85E"/>
+  <!-- head tuft -->
+  <circle cx="55" cy="26" r="5" fill="#F9D85E"/>
+  <circle cx="64" cy="22" r="6" fill="#F9D85E"/>
+  <circle cx="73" cy="26" r="5" fill="#F9D85E"/>
+
+  <!-- eyes with highlights -->
+  <circle cx="51" cy="52" r="6" fill="#2A1C12"/>
+  <circle cx="77" cy="52" r="6" fill="#2A1C12"/>
+  <circle cx="53" cy="49.5" r="2" fill="#fff"/>
+  <circle cx="79" cy="49.5" r="2" fill="#fff"/>
+
+  <!-- bill -->
+  <ellipse cx="64" cy="68" rx="16" ry="9" fill="#F2A03D"/>
+  <path d="M48 68 h32" stroke="#D9852A" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

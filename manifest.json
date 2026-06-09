@@ -1,0 +1,41 @@
+{
+  "manifest_version": 3,
+  "name": "Awwblock",
+  "version": "0.2.0",
+  "description": "Replaces ads with calming animals: capybaras, ducks, puppies, and kittens. A small moment of calm where a banner used to be.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Awwblock"
+  },
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["animals.js", "content.js"],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["photos/*"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "awwblock@benjaminmullins.tv",
+      "strict_min_version": "115.0"
+    }
+  }
+}

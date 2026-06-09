@@ -1,0 +1,15 @@
+# Raw source assets (huge; not part of the loadable extension)
+assets/
+Sized_Images/
+
+# OS / build junk
+.DS_Store
+**/.DS_Store
+__pycache__/
+*.pyc
+node_modules/
+
+# Internal build notes / prompt docs (kept local, not shipped)
+BUILD-NOTES.md
+CAPYBARA-PROMPTS.md
+CAPYBARA-ASSET-SPEC.md

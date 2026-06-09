@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Awwblock: Crop Studio</title>
+<style>
+  :root { --fur:#B08458; --muzzle:#7A5A3C; --cream:#F3E2BE; --ink:#3D2B1F; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    color:var(--ink); background:#F7EFDD;
+    display:grid; grid-template-columns: 230px 1fr 250px; grid-template-rows:auto 1fr;
+    grid-template-areas: "head head head" "left stage right"; height:100vh;
+  }
+  header { grid-area:head; padding:10px 16px; background:var(--muzzle); color:#fff;
+           display:flex; align-items:center; gap:14px; }
+  header h1 { font-size:15px; margin:0; font-weight:700; }
+  header .hint { font-size:12px; opacity:.85; }
+  .panel { padding:14px; overflow:auto; }
+  #left { grid-area:left; background:#EFE2C6; border-right:1px solid #d8c7a3; }
+  #right { grid-area:right; background:#EFE2C6; border-left:1px solid #d8c7a3; }
+  #stage { grid-area:stage; display:flex; flex-direction:column; align-items:center;
+           justify-content:center; gap:14px; padding:16px; overflow:auto; }
+  h2 { font-size:11px; text-transform:uppercase; letter-spacing:1px; opacity:.6; margin:4px 2px 8px; }
+  .preset { display:block; width:100%; text-align:left; margin:0 0 6px; padding:8px 10px;
+            border:1px solid #d2bf99; border-radius:8px; background:#fff; cursor:pointer; font-size:13px; }
+  .preset small { color:#9a865f; }
+  .preset.active { background:var(--fur); color:#fff; border-color:var(--fur); }
+  .preset.active small { color:#fff; }
+  .group { margin-bottom:14px; }
+  canvas#view { background:
+      linear-gradient(45deg,#ddd 25%,transparent 25%,transparent 75%,#ddd 75%),
+      linear-gradient(45deg,#ddd 25%,#fff 25%,#fff 75%,#ddd 75%);
+    background-size:20px 20px; background-position:0 0,10px 10px;
+    border:2px solid var(--muzzle); border-radius:4px; cursor:grab; touch-action:none; }
+  canvas#view:active { cursor:grabbing; }
+  .row { display:flex; gap:8px; align-items:center; margin:8px 0; font-size:13px; }
+  .row label { flex:0 0 auto; }
+  input[type=range]{ flex:1; accent-color:var(--fur); }
+  button.act { width:100%; padding:10px; border:none; border-radius:9px; background:var(--fur);
+               color:#fff; font-weight:700; font-size:14px; cursor:pointer; margin-top:6px; }
+  button.ghost { background:#fff; color:var(--muzzle); border:1px solid #d2bf99; }
+  #thumbs { display:flex; flex-wrap:wrap; gap:6px; }
+  #thumbs img { width:60px; height:60px; object-fit:cover; border-radius:6px; border:2px solid transparent; cursor:pointer; }
+  #thumbs img.sel { border-color:var(--fur); }
+  .swatches { display:flex; gap:6px; margin:6px 0; }
+  .sw { width:26px; height:26px; border-radius:6px; border:2px solid #fff; box-shadow:0 0 0 1px #ccc; cursor:pointer; }
+  .sw.sel { box-shadow:0 0 0 2px var(--fur); }
+  .fld { width:100%; padding:7px; border:1px solid #d2bf99; border-radius:7px; font-size:13px; }
+  .small { font-size:11px; opacity:.7; line-height:1.4; }
+  .sizeBadge { font-size:12px; background:#fff; border:1px solid #d2bf99; border-radius:6px; padding:3px 7px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🦫 Crop Studio</h1>
+  <span class="hint">Load images → pick a size → drag &amp; scroll to frame → Export. Backdrop fills behind transparent cutouts.</span>
+</header>
+
+<div id="left" class="panel">
+  <div class="group">
+    <h2>Animal</h2>
+    <select id="animal" class="fld">
+      <option>capybara</option><option>duck</option><option>puppy</option><option>kitten</option>
+    </select>
+  </div>
+  <div class="group">
+    <h2>Rectangle</h2>
+    <div id="g-rect"></div>
+  </div>
+  <div class="group">
+    <h2>Portrait / Skyscraper</h2>
+    <div id="g-tall"></div>
+  </div>
+  <div class="group">
+    <h2>Leaderboard</h2>
+    <div id="g-wide"></div>
+  </div>
+  <div class="group">
+    <h2>Custom</h2>
+    <div class="row"><input id="cw" class="fld" type="number" placeholder="W" style="width:70px">
+      <span>×</span><input id="ch" class="fld" type="number" placeholder="H" style="width:70px"></div>
+    <button class="act ghost" id="useCustom">Use custom size</button>
+  </div>
+</div>
+
+<div id="stage">
+  <div class="row"><span class="sizeBadge" id="badge">no size selected</span></div>
+  <canvas id="view" width="560" height="320"></canvas>
+  <div class="row" style="width:min(560px,90%)">
+    <label>Zoom</label>
+    <input id="zoom" type="range" min="10" max="500" value="100">
+    <button class="ghost" id="fill" style="width:auto;padding:6px 10px;border-radius:8px">Fill</button>
+    <button class="ghost" id="fit" style="width:auto;padding:6px 10px;border-radius:8px">Fit</button>
+  </div>
+</div>
+
+<div id="right" class="panel">
+  <div class="group">
+    <h2>Images</h2>
+    <input id="file" class="fld" type="file" accept="image/png,image/jpeg" multiple>
+    <div id="thumbs" style="margin-top:8px"></div>
+  </div>
+  <div class="group">
+    <h2>Backdrop (behind cutouts)</h2>
+    <div class="swatches" id="swatches"></div>
+    <div class="small">Cream matches the ad-slot background. Choose “transparent” to keep the PNG’s alpha.</div>
+  </div>
+  <div class="group">
+    <h2>Export</h2>
+    <div class="row"><label>Quality ×</label>
+      <select id="scale" class="fld"><option value="1">1× (exact)</option><option value="2" selected>2× (crisp)</option><option value="3">3×</option></select></div>
+    <button class="act" id="export">⬇︎ Export this size</button>
+    <div class="small" id="exhint" style="margin-top:8px"></div>
+  </div>
+</div>
+
+<script>
+const PRESETS = {
+  "g-rect":[["300×250","rect",300,250],["336×280","rect",336,280],["250×250","rect",250,250],["200×200","rect",200,200]],
+  "g-tall":[["300×600","portrait",300,600],["160×600","tall",160,600],["120×600","tall",120,600]],
+  "g-wide":[["728×90","wide",728,90],["970×90","wide",970,90],["320×50","wide",320,50],["970×250","rect",970,250]],
+};
+const CREAM="#F3E2BE";
+const BACKDROPS=[["cream",CREAM],["white","#FFFFFF"],["soft pink","#F7E1E4"],["sky","#DCECF5"],["transparent",null]];
+let images=[], curImg=null, preset=null, backdrop=CREAM;
+let scale=1, ox=0, oy=0; // image transform within frame (frame-space px, frame centered at 0,0)
+const view=document.getElementById("view"), ctx=view.getContext("2d");
+
+// build preset buttons
+for(const [gid,list] of Object.entries(PRESETS)){
+  const host=document.getElementById(gid);
+  list.forEach(p=>{
+    const b=document.createElement("button"); b.className="preset";
+    b.innerHTML=`${p[0]} <small>${p[1]}</small>`;
+    b.onclick=()=>selectPreset({label:p[0],bucket:p[1],w:p[2],h:p[3],el:b});
+    host.appendChild(b);
+  });
+}
+// backdrops
+const sw=document.getElementById("swatches");
+BACKDROPS.forEach(([name,hex],i)=>{
+  const d=document.createElement("div"); d.className="sw"+(i===0?" sel":"");
+  d.title=name; d.style.background = hex||"conic-gradient(#ccc 90deg,#fff 0 180deg,#ccc 0 270deg,#fff 0)";
+  d.onclick=()=>{ document.querySelectorAll(".sw").forEach(x=>x.classList.remove("sel")); d.classList.add("sel"); backdrop=hex; draw(); };
+  sw.appendChild(d);
+});
+
+document.getElementById("file").addEventListener("change",e=>{
+  for(const f of e.target.files){
+    const img=new Image();
+    img.onload=()=>{ images.push(img); addThumb(img); if(!curImg){curImg=img; if(preset) resetFill();} };
+    img.src=URL.createObjectURL(f);
+  }
+});
+function addThumb(img){
+  const t=document.getElementById("thumbs"); const im=document.createElement("img");
+  im.src=img.src; im.onclick=()=>{ curImg=img; [...t.children].forEach(c=>c.classList.remove("sel")); im.classList.add("sel"); resetFill(); };
+  if(!t.children.length) im.classList.add("sel");
+  t.appendChild(im);
+}
+
+function selectPreset(p){
+  document.querySelectorAll(".preset").forEach(x=>x.classList.remove("active"));
+  p.el.classList.add("active");
+  preset=p;
+  document.getElementById("badge").textContent = `${p.label}  ·  ${p.bucket}`;
+  // size the view canvas to the slot aspect, max ~560 wide / 360 tall
+  const maxW=560,maxH=360, k=Math.min(maxW/p.w, maxH/p.h);
+  view.width=Math.round(p.w*k); view.height=Math.round(p.h*k);
+  resetFill();
+  document.getElementById("exhint").textContent =
+    `exports ${p.w*(+document.getElementById("scale").value)}×${p.h*(+document.getElementById("scale").value)} px → name: ${fname()}`;
+}
+document.getElementById("useCustom").onclick=()=>{
+  const w=+document.getElementById("cw").value, h=+document.getElementById("ch").value;
+  if(w>0&&h>0){ const bucket = w/h>=2.2?"wide":(w/h<=0.45?"tall":(w/h<=0.7?"portrait":"rect"));
+    selectPreset({label:`${w}×${h}`,bucket,w,h,el:document.createElement("button")}); }
+};
+
+function resetFill(){ if(!curImg||!preset)return; // cover
+  const s=Math.max(view.width/curImg.width, view.height/curImg.height); scale=s; ox=0; oy=0;
+  document.getElementById("zoom").value=Math.round(s/baseScale()*100); draw(); }
+function resetFit(){ if(!curImg||!preset)return; const s=Math.min(view.width/curImg.width, view.height/curImg.height); scale=s; ox=0; oy=0;
+  document.getElementById("zoom").value=Math.round(s/baseScale()*100); draw(); }
+function baseScale(){ return Math.min(view.width/curImg.width, view.height/curImg.height); }
+document.getElementById("fill").onclick=resetFill;
+document.getElementById("fit").onclick=resetFit;
+document.getElementById("zoom").oninput=e=>{ if(!curImg)return; scale=baseScale()*(+e.target.value/100); draw(); };
+
+// pan
+let drag=null;
+view.addEventListener("pointerdown",e=>{ drag={x:e.offsetX,y:e.offsetY,ox,oy}; view.setPointerCapture(e.pointerId); });
+view.addEventListener("pointermove",e=>{ if(!drag)return; ox=drag.ox+(e.offsetX-drag.x); oy=drag.oy+(e.offsetY-drag.y); draw(); });
+view.addEventListener("pointerup",()=>drag=null);
+view.addEventListener("wheel",e=>{ if(!curImg)return; e.preventDefault();
+  const f=Math.exp(-e.deltaY*0.0015);
+  scale*=f; ox*=f; oy*=f; // zoom around frame center, keeping framing stable
+  document.getElementById("zoom").value=Math.round(scale/baseScale()*100); draw(); },{passive:false});
+
+function paint(c,cw,ch,img,s,offx,offy){
+  const g=c.getContext("2d"); g.clearRect(0,0,cw,ch);
+  if(backdrop){ g.fillStyle=backdrop; g.fillRect(0,0,cw,ch); }
+  const dw=img.width*s, dh=img.height*s;
+  g.imageSmoothingQuality="high";
+  g.drawImage(img, cw/2-dw/2+offx, ch/2-dh/2+offy, dw, dh);
+}
+function draw(){ if(!curImg||!preset){ctx.clearRect(0,0,view.width,view.height);return;} paint(view,view.width,view.height,curImg,scale,ox,oy); }
+
+function fname(){
+  const a=document.getElementById("animal").value;
+  return `${a}_${preset.bucket}_${preset.w}x${preset.h}_${Date.now().toString().slice(-5)}.png`;
+}
+document.getElementById("scale").onchange=()=>{ if(preset) selectPreset(preset); };
+document.getElementById("export").onclick=()=>{
+  if(!curImg||!preset){ alert("Load an image and pick a size first."); return; }
+  const q=+document.getElementById("scale").value;
+  const out=document.createElement("canvas"); out.width=preset.w*q; out.height=preset.h*q;
+  const ratio=out.width/view.width;
+  paint(out,out.width,out.height,curImg,scale*ratio,ox*ratio,oy*ratio);
+  const a=document.createElement("a"); a.download=fname(); a.href=out.toDataURL("image/png"); a.click();
+};
+</script>
+</body>
+</html>
