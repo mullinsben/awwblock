@@ -16,13 +16,13 @@ Real ad slots on real news sites, quietly turned calm. (The sites didn't agree t
 
 ![Five kittens lapping milk from a long saucer, filling GeekWire's header where a banner ad used to be](docs/screenshots/1.jpg)
 
-*GeekWire's header leaderboard, reassigned to five kittens and a saucer of milk.*
+*GeekWire's header leaderboard, optimized to five kittens and a saucer of milk.*
 
 | | |
 | --- | --- |
 | ![A line of ducklings walking across the top of Fox News](docs/screenshots/3.jpg) | ![A sleeping corgi filling a Fox News banner, with a kitten on a scratching post in the sidebar](docs/screenshots/4.jpg) |
 
-*Fox News: ducklings on parade up top (left); a sleeping corgi in the billboard and a kitten on the scratching post in the rail (right).*
+*Fox News: a big improvement! ducklings on parade up top (left); a sleeping corgi in the billboard and a kitten on the scratching post in the rail (right).*
 
 <img src="docs/screenshots/5.jpg" width="300" alt="The Awwblock popup showing 2,707 cuties deployed, with an on/off switch and per-animal toggles">
 
